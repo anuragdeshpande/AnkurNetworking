@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.personal'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    implementation 'com.github.javaparser:javaparser-core:3.18.0'
+}
+
+test {
+    useJUnitPlatform()
+}
