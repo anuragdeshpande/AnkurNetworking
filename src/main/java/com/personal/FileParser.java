@@ -14,7 +14,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 import org.apache.commons.lang3.ArrayUtils;
-import sun.security.util.ArrayUtil;
+//import sun.security.util.Arra;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class FileParser {
     public static void main(String[] args) throws IOException {
         JavaSymbolSolver solver = new JavaSymbolSolver(new CombinedTypeSolver());
         StaticJavaParser.getConfiguration().setSymbolResolver(solver);
-        CompilationUnit compilationUnit = StaticJavaParser.parse(new File("./src/main/java/com/personal/JFrameExample.java"));
+        CompilationUnit compilationUnit = StaticJavaParser.parse(new File("./src/main/java/com/personal/Example.java"));
         ClassOrInterfaceDeclaration sourceFile = compilationUnit.getTypes().get(0).asClassOrInterfaceDeclaration();
         List<MethodDeclaration> methods = sourceFile.getMethods();
         /*Task 1
@@ -39,31 +39,31 @@ public class FileParser {
          * 5. parameter type (if applicable)
          * 6. parameter name (if applicable)
          * */
-//        AsciiTable task1 = new AsciiTable();
-//        task1.addRule();
-//        task1.addRow(null, null, null, null, null, "Task 1: Methods list and their details").setTextAlignment(TextAlignment.CENTER);
-//        task1.addRule();
-//        task1.addRow("", "Name", "Return Type", "Start Line", "End Line", "Parameters");
-//        task1.addRule();
-//        for (int i = 1; i <= methods.size(); i++) {
-//            MethodDeclaration method = methods.get(i-1);
-//            int startLine = -1;
-//            int endLine = -1;
-//            if(method.getBegin().isPresent()){
-//                startLine = method.getBegin().get().line;
-//            }
-//
-//            if(method.getEnd().isPresent()){
-//                endLine = method.getEnd().get().line;
-//            }
-//            StringBuilder builder = new StringBuilder();
-//            for (Parameter parameter : method.getParameters()) {
-//                builder.append("<br>").append("Name: ").append(parameter.getName()).append(" Type: ").append(parameter.getType());
-//            }
-//            task1.addRow("Method " + i, method.getName(), method.getType(), startLine != -1 ? startLine : "-", endLine != -1 ? endLine : "-", builder.toString());
-//            task1.addRule();
-//        }
-//        System.out.println(task1.render());
+        AsciiTable task1 = new AsciiTable();
+        task1.addRule();
+        task1.addRow(null, null, null, null, null, "Task 1: Methods list and their details").setTextAlignment(TextAlignment.CENTER);
+        task1.addRule();
+        task1.addRow("", "Name", "Return Type", "Start Line", "End Line", "Parameters");
+        task1.addRule();
+        for (int i = 1; i <= methods.size(); i++) {
+            MethodDeclaration method = methods.get(i - 1);
+            int startLine = -1;
+            int endLine = -1;
+            if (method.getBegin().isPresent()) {
+                startLine = method.getBegin().get().line;
+            }
+
+            if (method.getEnd().isPresent()) {
+                endLine = method.getEnd().get().line;
+            }
+            StringBuilder builder = new StringBuilder();
+            for (Parameter parameter : method.getParameters()) {
+                builder.append("<br>").append("Name: ").append(parameter.getName()).append(" Type: ").append(parameter.getType());
+            }
+            task1.addRow("Method " + i, method.getName(), method.getType(), startLine != -1 ? startLine : "-", endLine != -1 ? endLine : "-", builder.toString());
+            task1.addRule();
+        }
+        System.out.println(task1.render());
 
 
 
@@ -71,6 +71,7 @@ public class FileParser {
          * For each line in a method body, if it is a function call
          * find other methods that have been called on the variable
          */
+        System.out.println("-------------Task:2-------------");
         HashMap<String, ArrayList<String>> methodCalls = new HashMap<>();
         methods.forEach(method -> {
             method.getBody().ifPresent(body -> {
@@ -87,13 +88,19 @@ public class FileParser {
                             }
                             Object[] array = methodCalls.get(nameAsString).toArray();
                             ArrayUtils.reverse(array);
-//                            System.out.println("Found method call for : " + nameAsString + ", List until now: " + Arrays.toString(array));
+                            System.out.println("Found method call for : " + nameAsString + ", List until now: " + Arrays.toString(array));
+                            methodCalls.forEach((key, value) -> {
+                                //System.out.println(key);
+                                System.out.println(Arrays.toString(value.toArray()));
+                            });
 
                         });
 
                         expressionStmt.getExpression().ifMethodCallExpr(methodCallExpr -> {
                             methodCallExpr.getScope().ifPresent(expression -> {
                                 resolveMethodCalls(methodCallExpr, methodCalls);
+
+
                             });
                         });
                     });
@@ -101,7 +108,8 @@ public class FileParser {
             });
         });
 
-        /*
+
+/*
          * Task 3: For each receiver variable collect all the methods that take this variable as a parameter.
          */
 
@@ -115,6 +123,7 @@ public class FileParser {
                                     objectCreationExpr.getArguments().forEach(argument -> {
                                         if(methodCalls.containsKey(argument.toString())){
                                             int line = objectCreationExpr.getBegin().get().line;
+                                            System.out.println("-------------Task:3-------------");
                                             System.out.println(argument+" was used as parameter while creating object for "+objectCreationExpr.getType()+" on line: "+line);
                                         }
                                     });
@@ -126,7 +135,7 @@ public class FileParser {
                             methodCallExpr.getArguments().forEach(argument -> {
                                 if(methodCalls.containsKey(argument.toString())){
                                     int line = methodCallExpr.getBegin().get().line;
-                                    System.out.println(argument+" was used as a parameter in method call "+methodCallExpr.getNameAsString()+" on line: "+line);
+                                   System.out.println(argument+" was used as a parameter in method call "+methodCallExpr.getNameAsString()+" on line: "+line);
                                 }
                             });
                         });
@@ -153,7 +162,7 @@ public class FileParser {
                 }
                 Object[] array = methodCalls.get(nameExpr.getNameAsString()).toArray();
                 ArrayUtils.reverse(array);
-//                System.out.println("Found method call for : " + nameExpr.getNameAsString() + ", List until now: " + Arrays.toString((array)));
+                System.out.println("Found method call for : " + nameExpr.getNameAsString() + ", List until now: " + Arrays.toString((array)));
 
             });
 
