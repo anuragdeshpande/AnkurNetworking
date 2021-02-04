@@ -1,0 +1,6 @@
+com/personal/Person.java
+ com.personal.Person
+com/personal/Example.java
+ com.personal.JFrameExample
+com/personal/FileParser.java
+ com.personal.FileParser
