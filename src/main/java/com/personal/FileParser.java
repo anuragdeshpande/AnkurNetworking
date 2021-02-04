@@ -100,7 +100,6 @@ public class FileParser {
                             methodCallExpr.getScope().ifPresent(expression -> {
                                 resolveMethodCalls(methodCallExpr, methodCalls);
 
-
                             });
                         });
                     });
